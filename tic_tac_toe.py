@@ -47,8 +47,44 @@ class TicTacToeGame:
           first_diagonal = [row[i] for i, row  in enumerate(rows)]
           second_diagonal = [col[j] for j , col in enumerate(reversed(columns))]
           return rows + columns + [first_diagonal , second_diagonal]
-           
-          
+     
+     def is_valid_move(self, move):
+          '''Boolean method, returns true if is valid move, and False otherwise.'''
+          row, col = move.row, move.col
+          move_was_not_played = self._current_moves[row][col].label == ""
+          no_winner = not self._has_a_winner
+          return no_winner and move_was_not_played
+     
+     def process_move(self, move):
+          '''Process the current move and checks if it's a win'''
+          row , col = move.row, move.col
+          self._current_moves[row][col] = move
+          for combo in self._winning_combos:
+               result = set(
+                    self._current_moves[n][m].label
+                    for n,m in combo
+               )
+               is_win = (len(result) == 1) and ("" not in result) 
+               if is_win:
+                    self._has_a_winner = True
+                    self.winner_combo = combo
+                    break
+               
+     def has_a_winner(self):
+          '''Returns True if game has a winner, False otherwise'''
+          return self._has_a_winner
+     
+     def is_tied(self):
+          '''Boolean Method, return True if game is tied'''
+          no_winner = not self.has_a_winner
+          played_moves = (
+               move.label for row in self._current_moves for move in row
+          )
+          return no_winner and all(played_moves)
+     
+     def toggle_player(self):
+          '''Return a toggled player'''
+          self.currente_player = next(self._players)
      
 
 class TicTacToeBoard(tk.Tk):
